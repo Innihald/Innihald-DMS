@@ -1,0 +1,72 @@
+digraph microservices {
+    rankdir=LR;
+    
+    node[fillcolor="#FFCCBC" style="filled" fontcolor="black" shape=box];
+    auth_api[label="Auth API"]; utility_api[label="Utility API"]; content_api[label="Content API"]; manage_api[label="Management API"];
+    
+    node[fillcolor="#FFCCEE" style="filled" fontcolor="black" shape=box];
+    frontend_api[label="Frontend API"]; backend_api[label="Backend API"];
+    
+    node[fillcolor="#BCFFCC" style="filled" fontcolor="black" shape=ellipse];
+    config[label="Config"]; media[label="Media"]; content[label="Content"]; news[label="News"]; page[label="Page"]; user[label="User"]; event[label="Event"];
+    
+    node[fillcolor="#CCBCFF" style="filled" fontcolor="black" shape=cylinder];
+    postgres[label="PostgreSQL"]; mongodb[label="Mongo DB"];
+    
+    node[fillcolor="#AAEEFF" style="filled" fontcolor="black" shape=component];
+    azure_storage[label="Azure Storage/S3"]
+    
+    
+    subgraph api {
+    
+        content_api -> content
+        content_api -> news
+        content_api -> page
+        content_api -> event
+        
+        utility_api -> media
+        
+        auth_api -> user
+        
+        manage_api -> user
+        
+        frontend_api -> {content_api, utility_api, auth_api}
+        backend_api -> {content_api, utility_api, manage_api}
+    }
+    
+    subgraph repository {
+        content -> user
+        content -> config
+        
+        news -> content
+        news -> media
+        news -> config
+        
+        page -> content
+        page -> media
+        page -> config
+        
+        event -> content
+        event -> news
+        event -> media
+        event -> config
+        
+        user -> config
+        
+        media -> config
+    }
+    
+    
+    subgraph database {
+        content -> postgres;
+        media -> mongodb;
+        news -> postgres;
+        page -> postgres;
+        user -> postgres;
+        config -> mongodb
+    }
+    
+    subgraph external_systems {
+        media -> azure_storage
+    }
+}
