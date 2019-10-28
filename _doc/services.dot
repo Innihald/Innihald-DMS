@@ -1,3 +1,4 @@
+
 digraph microservices {
     rankdir=LR;
     
@@ -8,10 +9,10 @@ digraph microservices {
     frontend_api[label="Frontend API"]; backend_api[label="Backend API"];
     
     node[fillcolor="#BCFFCC" style="filled" fontcolor="black" shape=ellipse];
-    config[label="Config"]; media[label="Media"]; content[label="Content"]; news[label="News"]; page[label="Page"]; user[label="User"]; event[label="Event"];
+    media[label="Media"]; content[label="Content"]; news[label="News"]; page[label="Page"]; user[label="User"]; event[label="Event"];
     
     node[fillcolor="#CCBCFF" style="filled" fontcolor="black" shape=cylinder];
-    postgres[label="PostgreSQL"]; mongodb[label="Mongo DB"];
+    postgres[label="PostgreSQL"]; mongodb[label="Mongo DB"];config[label="Consul"];
     
     node[fillcolor="#AAEEFF" style="filled" fontcolor="black" shape=component];
     azure_storage[label="Azure Storage/S3"]
@@ -29,6 +30,7 @@ digraph microservices {
         auth_api -> user
         
         manage_api -> user
+        manage_api -> config
         
         frontend_api -> {content_api, utility_api, auth_api}
         backend_api -> {content_api, utility_api, manage_api}
@@ -36,24 +38,18 @@ digraph microservices {
     
     subgraph repository {
         content -> user
-        content -> config
         
         news -> content
         news -> media
-        news -> config
         
         page -> content
         page -> media
-        page -> config
         
         event -> content
         event -> news
         event -> media
-        event -> config
         
-        user -> config
         
-        media -> config
     }
     
     
@@ -63,7 +59,13 @@ digraph microservices {
         news -> postgres;
         page -> postgres;
         user -> postgres;
-        config -> mongodb
+        
+        event -> config
+        user -> config
+        media -> config
+        news -> config
+        content -> config
+        page -> config
     }
     
     subgraph external_systems {
