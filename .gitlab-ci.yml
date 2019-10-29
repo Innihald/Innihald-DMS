@@ -1,0 +1,10 @@
+---
+stages:
+  - build
+  - test
+  - package
+  - deploy
+
+
+include:
+  - '/service/content_repository_service/.gitlab-ci.yml'
