@@ -4,6 +4,7 @@ stages:
   - verify
   - test
   - package
+  - package_docker
   - deploy
 
 
