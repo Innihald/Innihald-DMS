@@ -19,6 +19,12 @@ cache:
     paths:
         - .m2/repository
 
+.crs_only:
+    only:
+        changes:
+            - "*"
+            - "service/content_repository_service/**/*"
+
 crs_verify:
   stage: verify
   script:
@@ -39,24 +45,33 @@ crs_package:
         expire_in: 1 week
 
 crs_docker:
-    only:
-        changes:
-            - "*"
-            - "service/content_repository_service/**/*"
+    extends:
+        - .crs_only
+        - .docker_build
     needs:
         - crs_verify
         - crs_test
         - crs_package
     stage: package_docker
-    image: docker:19.03.1
-    services:
-        - name: docker:19.03.1-dind
-          alias: docker
-    variables:
-        # Use TLS https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#tls-enabled
-        DOCKER_HOST: tcp://docker:2376
-        DOCKER_TLS_CERTDIR: "/certs"
+    # write docker image name in variables
     script:
-        - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
         - docker build -t $CI_REGISTRY/dren-tech/innihald/monorepo/content_repository_service:latest --file service/content_repository_service/src/main/docker/Dockerfile.jvm .
+        - docker build -t $CI_REGISTRY/dren-tech/innihald/monorepo/content_repository_service:$CI_COMMIT_SHA --file service/content_repository_service/src/main/docker/Dockerfile.jvm .
         - docker push $CI_REGISTRY/dren-tech/innihald/monorepo/content_repository_service:latest
+        - docker push $CI_REGISTRY/dren-tech/innihald/monorepo/content_repository_service:$CI_COMMIT_SHA
+
+crs_docker-check:
+    extends:
+        - container_scanning
+    needs:
+        - crs_docker
+    only:
+        changes:
+            - "service/content_repository_service/**/*"
+    variables:
+        CI_APPLICATION_REPOSITORY: $CI_REGISTRY/dren-tech/innihald/monorepo/content_repository_service
+        CI_APPLICATION_TAG: $CI_COMMIT_SHA
+        JOB_SHOULD_RUN: "true"
+        KLAR_TRACE: "true"
+    before_script:
+        - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
