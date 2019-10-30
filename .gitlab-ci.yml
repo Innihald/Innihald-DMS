@@ -5,8 +5,30 @@ stages:
   - test
   - package
   - package_docker
+  - scan
   - deploy
 
 
 include:
+  - template: Container-Scanning.gitlab-ci.yml
   - '/service/content_repository_service/.gitlab-ci.yml'
+
+# mixins -> move to own file
+.docker_build:
+  image: docker:19.03.1
+  services:
+    - name: docker:19.03.1-dind
+      alias: docker
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  variables:
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_CERTDIR: "/certs"
+
+# global jobs
+container_scanning:
+  stage: scan
+  # set variable JOB_SHOULD_RUN to "true" if container should be checked
+  only:
+    variables:
+      - $JOB_SHOULD_RUN == "true"
