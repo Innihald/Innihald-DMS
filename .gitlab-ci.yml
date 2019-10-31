@@ -12,6 +12,7 @@ stages:
 include:
   - template: Container-Scanning.gitlab-ci.yml
   - template: Dependency-Scanning.gitlab-ci.yml
+  - template: License-Management.gitlab-ci.yml
   - '/service/content_repository_service/.gitlab-ci.yml'
 
 # mixins -> move to own file
@@ -38,3 +39,9 @@ dependency_scanning:
   stage: scan
   variables:
     DS_RUN_ANALYZER_TIMEOUT: "10m"
+
+license_management:
+  stage: scan
+  variables:
+    LM_JAVA_VERSION: "11"
+    MAVEN_CLI_OPTS: "-DskipTests=false -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
