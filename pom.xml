@@ -11,8 +11,8 @@
     <name>Innihald monorepo.</name>
 
     <modules>
-        <module>service/content_repository_service</module>
-        <module>service/page_repository_service</module>
+        <module>./service/content_repository_service</module>
+        <module>./service/page_repository_service</module>
     </modules>
 
     <build>
