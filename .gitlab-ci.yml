@@ -1,6 +1,5 @@
 ---
 stages:
-  - build
   - verify
   - test
   - package
@@ -38,17 +37,26 @@ container_scanning:
 
 dependency_scanning:
   stage: scan
+  only:
+    refs:
+      - master
   variables:
     DS_RUN_ANALYZER_TIMEOUT: "20m"
 
 license_management:
   stage: scan
+  only:
+    refs:
+      - master
   variables:
     LM_JAVA_VERSION: "11"
     MAVEN_CLI_OPTS: "-DskipTests=false -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
 
 sast:
   stage: scan
+  only:
+    refs:
+      - master
   variables:
     CI_DEBUG_TRACE: "true"
     MAVEN_CLI_OPTS: "-DskipTests=false" #-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
