@@ -6,10 +6,9 @@ An overview over the architecture of innihald.
 ```mermaid
 graph LR
 
-doc["Document-Repository"]
+doc["Document-Repository-Service"]
 file["File-Service"]
-meta["Metadata-Service"]
-prop["Custom-Properties-Service"]
+workflow["Workflow-Service"]
 
 worker["Async-Worker"]
 
@@ -25,14 +24,14 @@ client["Desktop-Client"]
 subgraph Services
 doc --> file
 doc --> worker
-doc --> prop
-doc --> meta
-prop --> meta
+
+workflow --> doc
+workflow --> worker
 
 file --> worker
 end
 api --> doc
-api --> prop
+api --> workflow
 
 subgraph Frontend
 web --> api
